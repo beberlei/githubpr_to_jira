@@ -1,0 +1,12 @@
+{
+    "jiraXmlRpcEndpoint": "",
+    "jiraUsername": "",
+    "jiraPassword": "",
+    "jiraTicketType": 4,
+    "daysBack": 14,
+    "githubOrganizationName": "doctrine",
+    "projects": {
+        "doctrine2": "DDC",
+        "dbal": "DBAL"
+    }
+}
