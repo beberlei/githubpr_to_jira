@@ -79,7 +79,7 @@ foreach ($config['projects'] AS $projectName => $jiraProjectShortname) {
             $body = str_replace(
                 array("{user}", "{url}", "{body}"),
                 array($pullRequest->user->login, $issueUrl, $pullRequest->body),
-                $jiraTicketTemplate
+                $config['jiraTicketTemplate']
             );
 
             $data = $client->call("jira1.createIssue", array($token, array(
