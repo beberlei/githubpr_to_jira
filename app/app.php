@@ -10,6 +10,11 @@ $app->post('/jira/{username}/{project}/accept-pull', function($username, $projec
 
     return new Response('{"ok":true}', 201, array('Content-Type' => 'application/json'));
 });
+$app->error(function (\Exception $e, $code) {
+    syslog(LOG_INFO, "JIRA Error [" . $code . "]: " . $e->getMessage());
+
+    return new Response(json_encode(array('error' => true, 'code' => $code)), $code, array('Content-Type' => 'application/json'));
+});
 
 class JiraProject
 {
@@ -65,7 +70,7 @@ function loadProject($username, $project)
         throw new \RuntimeException("Invalid project name given!");
     }
 
-    $config = json_decode(file_get_contents(__DIR__ "/../config/". $username."-".$project.".json"));
+    $config = json_decode(file_get_contents(__DIR__. "/../config/". $username."-".$project.".json"));
     $requiredValues = array("uri", "username", "password", "ticketType", "projectShortname", "hash");;
     $project = new JiraProject();
     $project->ticketType = 4;
@@ -78,8 +83,7 @@ Message:
 
 {body}
 
-ISSUETEXT
-    );
+ISSUETEXT;
 
     foreach ($requiredValues AS $key) {
         if (!isset($config[$key])) {
