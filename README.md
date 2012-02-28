@@ -1,20 +1,15 @@
 # Github PRs to Jira Issues
 
-If you are using Jira for your project and have your code on github then you have two sources of potential change.
-This is annoying to manage.
+Simple Silex Application that listens to Github PR Hook API and transforms the PRs to Jira Tickets.
 
-This script can be executed as cron every n-th minute.
-
-You have to put in your jira user account, organization/github username, and the projects you want to "observe".
+You have to configure your jira user account, organization/github username, and the projects you want to "observe".
 
 Dependency: Zend Framework XML RPC
 
 ## How it works
 
-Look at the example.json and copy it to yourproject.json. Adjust all the values and add the projects
-you want to observe.
+Look at the example.json and copy it to config/githubuser-githubrepo.json (example config/doctrine-doctrine2.json).
+Adjust all the values and add the projects you want to observe.
 
-1. Grab all open pull requests from Github project
-2. Check if the PR url can be found in any ticket of the associated jira project
-3. If no ticket is found with the url, create a new ticket linking to the Github PR.
+Add a pull-request hook to the github repository. You might need to use the API for this (no interface yet).
 

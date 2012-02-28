@@ -1,0 +1,68 @@
+{
+    "hash": "cfb7f3066463975c981e2d54aab4bd64",
+    "packages": [
+        {
+            "package": "pimple/pimple",
+            "version": "dev-master",
+            "source-reference": "321db91e49b6cf8cbeed58d8db662d40de96d2c3"
+        },
+        {
+            "package": "silex/silex",
+            "version": "dev-master",
+            "source-reference": "00f635b976057362581a5d7cb7522ba367423744"
+        },
+        {
+            "package": "symfony/browser-kit",
+            "version": "dev-master",
+            "source-reference": "afa16de6b91833b5a72ca89dc942ffb424737687",
+            "alias": "2.1.9999999.9999999-dev"
+        },
+        {
+            "package": "symfony/class-loader",
+            "version": "dev-master",
+            "source-reference": "8bceaa2f1fed52f6285b2cea39e7ae37fbea1c9b",
+            "alias": "2.1.9999999.9999999-dev"
+        },
+        {
+            "package": "symfony/css-selector",
+            "version": "dev-master",
+            "source-reference": "dcce8174c551814c7aadcf13a2f8d73f3a6b4347",
+            "alias": "2.1.9999999.9999999-dev"
+        },
+        {
+            "package": "symfony/dom-crawler",
+            "version": "dev-master",
+            "source-reference": "d35d208382d6e23a39a9e3c09357801b911eead6",
+            "alias": "2.1.9999999.9999999-dev"
+        },
+        {
+            "package": "symfony/event-dispatcher",
+            "version": "dev-master",
+            "source-reference": "f6b7f60b0c29ab8167de7d7c9ba78fc9cc283c64",
+            "alias": "2.1.9999999.9999999-dev"
+        },
+        {
+            "package": "symfony/http-foundation",
+            "version": "dev-master",
+            "source-reference": "2abe7f1b8e0f808dad0cc001b9d69371b604d719",
+            "alias": "2.1.9999999.9999999-dev"
+        },
+        {
+            "package": "symfony/http-kernel",
+            "version": "dev-master",
+            "source-reference": "cf2bb8655a13fcb516b1d0b95ddf0c51db25b2a8",
+            "alias": "2.1.9999999.9999999-dev"
+        },
+        {
+            "package": "symfony/routing",
+            "version": "dev-master",
+            "source-reference": "d3d9c02357b2db6503539d11f6c379ccd86f9cc4",
+            "alias": "2.1.9999999.9999999-dev"
+        },
+        {
+            "package": "zend/zf2",
+            "version": "1.0.0"
+        }
+    ],
+    "aliases": []
+}
