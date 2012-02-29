@@ -2,7 +2,7 @@
 # modify it manually. If you want to modify the Makefile model, modify the
 # packaging/Makefile.in file
 NAME=beberlei-github2jira
-VERSION=1.0.2
+VERSION=1.0.3
 MAINTAINER=Benjamin Eberlei <kontakt@beberlei.de>
 PACKAGENAME=beberlei-github2jira
 PACKAGETYPE=deb
