@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 $app = new Application();
 $app->post('/jira/{username}/{project}/accept-pull', function($username, $project, Application $app, Request $request) {
     $project = loadProject($username, $project);
-    synchronizePullRequest($request->get('payload'), $project);
+    synchronizePullRequest(json_decode($request->get('payload')), $project);
 
     return new Response('{"ok":true}', 201, array('Content-Type' => 'application/json'));
 });
@@ -22,7 +22,7 @@ class JiraProject
     public $uri;
     public $username;
     public $password;
-    public $projectShortname;
+    public $shortname;
     public $ticketType;
     public $assignUsername;
     public $template;
@@ -30,6 +30,9 @@ class JiraProject
 
 function synchronizePullRequest($pullRequest, JiraProject $project)
 {
+    if (!isset($pullRequest->html_url)) {
+        throw new \RuntimeException("Missing html url in Pull Request");
+    }
     $client = new \Zend\XmlRpc\Client($project->uri);
     $token = $client->call("jira1.login", array($project->username, $project->password));
 
@@ -54,7 +57,7 @@ function synchronizePullRequest($pullRequest, JiraProject $project)
 
         $data = $client->call("jira1.createIssue", array($token, array(
             "summary"       => $issuePrefix . " by " . $pullRequest->user->login . ": " . $pullRequest->title,
-            "project"       => $jiraProjectShortname,
+            "project"       => $project->shortname,
             "description"   => $body,
             "type"          => $project->ticketType,
             "assignee"      => $project->assignUsername
@@ -70,8 +73,8 @@ function loadProject($username, $project)
         throw new \RuntimeException("Invalid project name given!");
     }
 
-    $config = json_decode(file_get_contents(__DIR__. "/../config/". $username."-".$project.".json"));
-    $requiredValues = array("uri", "username", "password", "ticketType", "projectShortname", "hash");;
+    $config = json_decode(file_get_contents(__DIR__. "/../config/". $username."-".$project.".json"), true);
+    $requiredValues = array("uri", "username", "password", "ticketType", "shortname", "hash", "assignUsername");;
     $project = new JiraProject();
     $project->ticketType = 4;
     $project->template = <<<ISSUETEXT
