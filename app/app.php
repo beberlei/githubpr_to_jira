@@ -33,6 +33,7 @@ class JiraProject
 
 function synchronizePullRequest($pullRequest, JiraProject $project)
 {
+    $pullRequest = $pullRequest->pull_request;
     if (!isset($pullRequest->html_url)) {
         throw new \RuntimeException("Missing html url in Pull Request");
     }
