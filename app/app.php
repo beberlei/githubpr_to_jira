@@ -6,6 +6,9 @@ use Symfony\Component\HttpFoundation\Response;
 $app = new Application();
 $app->post('/jira/{username}/{project}/accept-pull', function($username, $project, Application $app, Request $request) {
     $project = loadProject($username, $project);
+    if ($project->hash != $request->get('hash')) {
+        throw new \RuntimeException("Invalid access token!");
+    }
     synchronizePullRequest(json_decode($request->get('payload')), $project);
 
     return new Response('{"ok":true}', 201, array('Content-Type' => 'application/json'));
