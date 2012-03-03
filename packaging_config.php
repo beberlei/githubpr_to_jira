@@ -1,6 +1,6 @@
 $configure = array(
     'packagename' => 'beberlei-github2jira',
-    'version' => '1.0.4',
+    'version' => '1.0.5',
     'maintainer' => 'Benjamin Eberlei <kontakt@beberlei.de>',
     'description' => 'Turns Github PRs into Jira Tickets',
     'url' => 'http://www.beberlei.de',

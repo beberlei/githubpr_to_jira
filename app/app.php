@@ -86,7 +86,7 @@ function loadProject($username, $project)
     $project = new JiraProject();
     $project->ticketType = 4;
     $project->template = <<<ISSUETEXT
-This issue is created automatically through a Github pull request on behalf of {username}:
+This issue is created automatically through a Github pull request on behalf of {user}:
 
   Url: {url}
 
