@@ -13,6 +13,7 @@ $app->post('/jira/{username}/{project}/accept-pull', function($username, $projec
 
     return new Response('{"ok":true}', 201, array('Content-Type' => 'application/json'));
 });
+
 $app->error(function (\Exception $e, $code) {
     syslog(LOG_INFO, "JIRA Error [" . $code . "]: " . $e->getMessage());
 
@@ -31,16 +32,47 @@ class JiraProject
     public $template;
 }
 
+class JiraIssue
+{
+    public $environment;
+    public $status;
+    public $reporter;
+    public $fixVersions = array();
+    public $resolution;
+    public $key;
+    public $type;
+    public $updated;
+    public $priority;
+    public $components;
+    public $affectedVersions = array();
+    public $assignee;
+    public $summary;
+    public $customFieldValues = array();
+    public $votes;
+    public $id;
+    public $description;
+    public $project;
+    public $created;
+
+    static public function createFromArray(array $data)
+    {
+        $issue = new self();
+        foreach ($data as $k => $v) {
+            if (property_exists($issue, $k)) {
+                $issue->$k = $v;
+            }
+        }
+        return $issue;
+    }
+}
+
 function synchronizePullRequest($pullRequest, JiraProject $project)
 {
-    if ($pullRequest->action != "opened") {
-        return;
-    }
-
     $pullRequest = $pullRequest->pull_request;
     if (!isset($pullRequest->html_url)) {
         throw new \RuntimeException("Missing html url in Pull Request");
     }
+
     $client = new \Zend\XmlRpc\Client($project->uri);
     $token = $client->call("jira1.login", array($project->username, $project->password));
 
@@ -54,9 +86,13 @@ function synchronizePullRequest($pullRequest, JiraProject $project)
         return false;
     }
 
-    $data = $client->call("jira1.getIssuesFromTextSearch", array($token, '"' . $issueUrl . '"'));
+    $issueSearchTerms = array($issueUrl, $issuePrefix);
+    if (preg_match_all('((' . preg_quote($project->shortname) . '\-[0-9]+))', $pullRequest->title . " " . $pullRequest->body, $matches)) {
+        $issueSearchTerms = array_values(array_unique($matches[1]));
+    }
+    $issues = searchJiraIssues($client, $token, $terms);
 
-    if (count($data) == 0) {
+    if (count($issues) == 0 && in_array($pullRequest->action, array('opened', 'synchronized'))) {
         $body = str_replace(
             array("{user}", "{url}", "{body}"),
             array($pullRequest->user->login, $issueUrl, $pullRequest->body),
@@ -64,15 +100,52 @@ function synchronizePullRequest($pullRequest, JiraProject $project)
         );
 
         $data = $client->call("jira1.createIssue", array($token, array(
-            "summary"       => $issuePrefix . " by " . $pullRequest->user->login . ": " . $pullRequest->title,
+            "summary"       => $issuePrefix . " " . $pullRequest->title,
             "project"       => $project->shortname,
             "description"   => $body,
             "type"          => $project->ticketType,
             "assignee"      => $project->assignUsername
         )));
-        return true;
+    } else {
+        $comment = "A related Github Pull-Request " . $issuePrefix . " was " . $pullRequest->action . "\n";
+        $comment .= $issueUrl;
+
+        foreach ($issues as $issue) {
+            $client->call("jira1.addComment", array($token, $issue->key, $comment));
+        }
     }
-    return false;
+    return true;
+}
+
+function createComment($message, $project, $pullRequest)
+{
+    $pullRequest = $pullRequest->pull_request;
+    if (!isset($pullRequest->html_url)) {
+        throw new \RuntimeException("Missing html url in Pull Request");
+    }
+
+    $issueUrl = $pullRequest->html_url;
+    $parts = explode("/", $issueUrl);
+    $pullRequestId = array_pop($parts);
+    $issuePrefix = "[GH-".$pullRequestId."]";
+
+    $created = new \DateTime($pullRequest->created_at);
+    if ($created->modify("+14 day") < $now) {
+        return false;
+    }
+
+    $issueSearchTerms = array($issueUrl, $issuePrefix);
+    if (preg_match_all('((' . preg_quote($project->shortname) . '\-[0-9]+))', $pullRequest->title . " " . $pullRequest->body, $matches)) {
+        $issueSearchTerms = array_values(array_unique($matches[1]));
+    }
+    $issues = searchJiraIssues($client, $token, $terms);
+
+    $comment = "This issue is referenced in Github Pull-Request " . $issuePrefix . "\n";
+    $comment .= $issueUrl;
+
+    foreach ($issues as $issue) {
+        $client->call("jira1.addComment", array($token, $issue->key, $comment));
+    }
 }
 
 function loadProject($username, $project)
