@@ -66,9 +66,25 @@ class JiraIssue
     }
 }
 
-function synchronizePullRequest($pullRequest, JiraProject $project)
+function searchJiraIssues($client, $token, array $terms)
 {
-    $pullRequest = $pullRequest->pull_request;
+    $issues = array();
+    foreach ($terms as $term) {
+        $data = $client->call("jira1.getIssuesFromTextSearch", array($token, '"' . $term . '"'));
+        foreach ($data as $row) {
+            $issue = JiraIssue::createFromArray($row);
+            $issues[$issue->key] = $issue;
+        }
+    }
+    return $issues;
+}
+
+function synchronizePullRequest($pullRequestEvent, JiraProject $project)
+{
+    if ( ! isset($pullRequestEvent->action)) {
+        throw new \RuntimeException("Missing action in Pull Request");
+    }
+    $pullRequest = $pullRequestEvent->pull_request;
     if (!isset($pullRequest->html_url)) {
         throw new \RuntimeException("Missing html url in Pull Request");
     }
@@ -81,6 +97,7 @@ function synchronizePullRequest($pullRequest, JiraProject $project)
     $pullRequestId = array_pop($parts);
     $issuePrefix = "[GH-".$pullRequestId."]";
 
+    $now = new \DateTime("now");
     $created = new \DateTime($pullRequest->created_at);
     if ($created->modify("+14 day") < $now) {
         return false;
@@ -90,9 +107,9 @@ function synchronizePullRequest($pullRequest, JiraProject $project)
     if (preg_match_all('((' . preg_quote($project->shortname) . '\-[0-9]+))', $pullRequest->title . " " . $pullRequest->body, $matches)) {
         $issueSearchTerms = array_values(array_unique($matches[1]));
     }
-    $issues = searchJiraIssues($client, $token, $terms);
+    $issues = searchJiraIssues($client, $token, $issueSearchTerms);
 
-    if (count($issues) == 0 && in_array($pullRequest->action, array('opened', 'synchronized'))) {
+    if (count($issues) == 0 && in_array($pullRequestEvent->action, array('opened', 'synchronized'))) {
         $body = str_replace(
             array("{user}", "{url}", "{body}"),
             array($pullRequest->user->login, $issueUrl, $pullRequest->body),
@@ -107,7 +124,7 @@ function synchronizePullRequest($pullRequest, JiraProject $project)
             "assignee"      => $project->assignUsername
         )));
     } else {
-        $comment = "A related Github Pull-Request " . $issuePrefix . " was " . $pullRequest->action . "\n";
+        $comment = "A related Github Pull-Request " . $issuePrefix . " was " . $pullRequestEvent->action . "\n";
         $comment .= $issueUrl;
 
         foreach ($issues as $issue) {
@@ -115,37 +132,6 @@ function synchronizePullRequest($pullRequest, JiraProject $project)
         }
     }
     return true;
-}
-
-function createComment($message, $project, $pullRequest)
-{
-    $pullRequest = $pullRequest->pull_request;
-    if (!isset($pullRequest->html_url)) {
-        throw new \RuntimeException("Missing html url in Pull Request");
-    }
-
-    $issueUrl = $pullRequest->html_url;
-    $parts = explode("/", $issueUrl);
-    $pullRequestId = array_pop($parts);
-    $issuePrefix = "[GH-".$pullRequestId."]";
-
-    $created = new \DateTime($pullRequest->created_at);
-    if ($created->modify("+14 day") < $now) {
-        return false;
-    }
-
-    $issueSearchTerms = array($issueUrl, $issuePrefix);
-    if (preg_match_all('((' . preg_quote($project->shortname) . '\-[0-9]+))', $pullRequest->title . " " . $pullRequest->body, $matches)) {
-        $issueSearchTerms = array_values(array_unique($matches[1]));
-    }
-    $issues = searchJiraIssues($client, $token, $terms);
-
-    $comment = "This issue is referenced in Github Pull-Request " . $issuePrefix . "\n";
-    $comment .= $issueUrl;
-
-    foreach ($issues as $issue) {
-        $client->call("jira1.addComment", array($token, $issue->key, $comment));
-    }
 }
 
 function loadProject($username, $project)
