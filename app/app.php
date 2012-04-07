@@ -84,6 +84,12 @@ function synchronizePullRequest($pullRequestEvent, JiraProject $project)
     if ( ! isset($pullRequestEvent->action)) {
         throw new \RuntimeException("Missing action in Pull Request");
     }
+
+    if ( $pullRequestEvent->action == "synchronize") {
+        // this is triggered way to often by Github
+        return false;
+    }
+
     $pullRequest = $pullRequestEvent->pull_request;
     if (!isset($pullRequest->html_url)) {
         throw new \RuntimeException("Missing html url in Pull Request");
@@ -109,7 +115,7 @@ function synchronizePullRequest($pullRequestEvent, JiraProject $project)
     }
     $issues = searchJiraIssues($client, $token, $issueSearchTerms);
 
-    if (count($issues) == 0 && in_array($pullRequestEvent->action, array('opened', 'synchronized'))) {
+    if (count($issues) == 0 && in_array($pullRequestEvent->action, array('opened'))) {
         $body = str_replace(
             array("{user}", "{url}", "{body}"),
             array($pullRequest->user->login, $issueUrl, $pullRequest->body),
