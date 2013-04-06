@@ -11,7 +11,7 @@ class Jira
 
     static public function create(JiraProject $project)
     {
-        $client = new Client($project->uri);
+        $client = new Client($project->uri . "/rpc/xmlrpc");
         $token = $client->call("jira1.login", array($project->username, $project->password));
 
         return new self($client, $token);
@@ -48,7 +48,9 @@ class Jira
             "type"          => $project->ticketType,
             "assignee"      => $project->assignUsername
         ));
-        return $this->client->call("jira1.createIssue", $payload);
+        $data =  $this->client->call("jira1.createIssue", $payload);
+
+        return JiraIssue::createFromArray($data);
     }
 
     public function addComment(JiraIssue $issue, $comment)

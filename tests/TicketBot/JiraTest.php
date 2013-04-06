@@ -31,6 +31,8 @@ class JiraTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateIssue()
     {
+        \Phake::when($this->client)->call(\Phake::anyParameters())->thenReturn(array());
+
         $project = new JiraProject();
         $project->assignUsername = "beberlei";
         $project->shortname = "DDC";

@@ -44,5 +44,45 @@ ISSUETEXT;
             $pullRequestEvent->action(),
             $pullRequestEvent->issueUrl());
     }
+
+    public function createNotifyComment(JiraIssue $issue, $notOnMaster = false)
+    {
+        $link = $this->uri . "/browse/" . $issue->id;
+
+        if ($notOnMaster) {
+            return <<<TEXT
+Hello,
+
+thank you for creating this pull request. However did not open it on the "master"
+branch. Our Git workflow requires all pull requests to go through "master" branch
+and the release masters then merge them back into stable branches, if they are
+bug fixes.
+
+Please open the pull request again for the "master" branch and close
+this one.
+
+Nevertheless I have opened a Jira ticket for this Pull Request to track this
+issue:
+
+$link
+
+We use Jira to track the state of pull requests and the versions they got
+included in.
+
+TEXT;
+        }
+
+        return <<<TEXT
+Hello,
+
+thank you for creating this pull request. I have automatically opened an issue
+on our Jira Bug Tracker for you. See the issue link:
+
+$link
+
+We use Jira to track the state of pull requests and the versions they got
+included in.
+TEXT;
+    }
 }
 

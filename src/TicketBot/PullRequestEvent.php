@@ -18,6 +18,16 @@ class PullRequestEvent
         $this->event = $event;
     }
 
+    public function repository()
+    {
+        return $this->event['pull_request']['base']['repo']['name'];
+    }
+
+    public function owner()
+    {
+        return $this->event['pull_request']['base']['repo']['owner']['login'];
+    }
+
     public function isSynchronize()
     {
         return $this->event['action'] === "synchronize";

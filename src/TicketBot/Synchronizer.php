@@ -8,10 +8,12 @@ namespace TicketBot;
 class Synchronizer
 {
     private $jira;
+    private $github;
 
-    public function __construct(Jira $jira)
+    public function __construct(Jira $jira, Github $github)
     {
         $this->jira = $jira;
+        $this->github = $github;
     }
 
     public function synchronizePullRequest(PullRequestEvent $pullRequestEvent, JiraProject $project)
@@ -25,7 +27,14 @@ class Synchronizer
 
         if ($pullRequestEvent->isOpened()) {
             $newIssue = $project->createTicket($pullRequestEvent);
-            $this->jira->createIssue($project, $newIssue);
+            $issue = $this->jira->createIssue($project, $newIssue);
+
+            $this->github->addComment(
+                $pullRequestEvent->owner(),
+                $pullRequestEvent->repository(),
+                $pullRequestEvent->getId(),
+                $project->createNotifyComment($issue)
+            );
 
             return true;
         }

@@ -3,6 +3,7 @@
     "require": {
         "silex/silex": "dev-master",
         "zendframework/zend-xmlrpc": "@stable",
+        "zendframework/zend-stdlib": "2.1.2",
         "knplabs/github-api": "@stable"
     },
     "require-dev": {

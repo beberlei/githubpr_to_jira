@@ -1,4 +1,5 @@
 <?php
+
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -6,16 +7,24 @@ use Symfony\Component\HttpFoundation\Response;
 use TicketBot\Synchronizer;
 use TicketBot\Loader;
 use TicketBot\Jira;
+use TicketBot\Github;
 use TicketBot\PullRequestEvent;
+
+use Github\Client;
 
 $app = new Application();
 $app->post('/jira/{username}/{project}/accept-pull', function($username, $project, Application $app, Request $request) {
+
+    $client = new Client();
+    $client->authenticate($request->server->get('GITHUB_OAUTH_TOKEN'));
+
+    $github = new Github($client);
     $loader = new Loader(__DIR__ . "/../config");
-    $synchronizer = new Synchronizer(Jira::create($project));
+    $synchronizer = new Synchronizer(Jira::create($project), $github);
 
     $project = $loader->loadProject($username, $project);
 
-    if ($project->hash != $request->get('hash')) {
+    if ($project->hash !== $request->get('hash')) {
         throw new \RuntimeException("Invalid access token!");
     }
 
