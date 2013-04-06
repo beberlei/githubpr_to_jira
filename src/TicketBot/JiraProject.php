@@ -45,11 +45,11 @@ ISSUETEXT;
             $pullRequestEvent->issueUrl());
     }
 
-    public function createNotifyComment(JiraIssue $issue, $notOnMaster = false)
+    public function createNotifyComment(JiraIssue $issue, $sentToMaster = true)
     {
         $link = $this->uri . "/browse/" . $issue->id;
 
-        if ($notOnMaster) {
+        if ( ! $sentToMaster) {
             return <<<TEXT
 Hello,
 

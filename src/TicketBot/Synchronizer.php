@@ -29,11 +29,13 @@ class Synchronizer
             $newIssue = $project->createTicket($pullRequestEvent);
             $issue = $this->jira->createIssue($project, $newIssue);
 
+
+
             $this->github->addComment(
                 $pullRequestEvent->owner(),
                 $pullRequestEvent->repository(),
                 $pullRequestEvent->getId(),
-                $project->createNotifyComment($issue)
+                $project->createNotifyComment($issue, $pullRequestEvent->isSendToMaster())
             );
 
             return true;

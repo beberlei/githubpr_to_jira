@@ -18,6 +18,11 @@ class PullRequestEvent
         $this->event = $event;
     }
 
+    public function isSendToMaster()
+    {
+        return $this->event['pull_request']['base']['ref'] === "master";
+    }
+
     public function repository()
     {
         return $this->event['pull_request']['base']['repo']['name'];
