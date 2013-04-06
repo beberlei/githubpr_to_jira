@@ -41,7 +41,20 @@ class Synchronizer
 
         foreach ($issues as $issue) {
             $this->jira->addComment($issue, $project->createComment($pullRequestEvent));
+
+            if ($pullRequestEvent->isClosed() && $pullRequestEvent->isMerged()) {
+                $this->jira->resolveIssue($issue);
+            }
+
+            if ($pullRequestEvent->isClosed() && ! $pullRequestEvent->isMerged()) {
+                $this->jira->markIssueInvalid($issue);
+            }
+
+            if ($pullRequestEvent->isReopened()) {
+                $this->jira->reopenIssue($issue);
+            }
         }
+
 
         return true;
     }

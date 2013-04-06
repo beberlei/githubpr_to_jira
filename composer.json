@@ -23,6 +23,6 @@
         }
     ],
     "archive": {
-        "exclude": ["!vendor", ".git", "phake/docs/build"]
+        "exclude": ["!vendor", ".git", "phake/docs", "*.swp"]
     }
 }

@@ -13,7 +13,7 @@ use TicketBot\PullRequestEvent;
 use Github\Client;
 
 $app = new Application();
-$app->post('/synchronizer/accept-pull', function(Application $app, Request $request) {
+$app->post('/synchronizer/accept', function(Application $app, Request $request) {
 
     $event = new PullRequestEvent(json_decode($request->get('payload'), true));
 
@@ -37,7 +37,7 @@ $app->post('/synchronizer/accept-pull', function(Application $app, Request $requ
 });
 
 $app->error(function (\Exception $e, $code) {
-    syslog(LOG_INFO, "JIRA Error [" . $code . "]: " . $e->getMessage());
+    syslog(LOG_INFO, "JIRA Error [" . $code . "]: " . $e->getMessage() . $e->getTraceAsString());
 
     return new Response(json_encode(array('error' => true, 'code' => $code)), $code, array('Content-Type' => 'application/json'));
 });

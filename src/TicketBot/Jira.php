@@ -57,4 +57,22 @@ class Jira
     {
         return $this->client->call("jira1.addComment", array($this->token, $issue->key, $comment));
     }
+
+    public function resolveIssue(JiraIssue $issue)
+    {
+        $this->client->call("jira1.updateIssue", array(
+            $this->token,
+            $issue->key,
+            array("resolution" => 1, "status" => 5)
+        ));
+    }
+
+    public function markIssueInvalid(JiraIssue $issue)
+    {
+        $this->client->call("jira1.updateIssue", array(
+            $this->token,
+            $issue->key,
+            array("resolution" => 6, "status" => 5)
+        ));
+    }
 }

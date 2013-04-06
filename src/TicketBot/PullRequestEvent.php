@@ -48,7 +48,7 @@ class PullRequestEvent
         return $this->event['action'] === "closed";
     }
 
-    public function isReopend()
+    public function isReopened()
     {
         return $this->event['action'] == "reopened";
     }
@@ -101,5 +101,10 @@ class PullRequestEvent
         }
 
         return $issueSearchTerms;
+    }
+
+    public function isMerged()
+    {
+        return $this->event['pull_request']['merged'];
     }
 }
