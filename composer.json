@@ -1,5 +1,7 @@
 {
     "name": "beberlei/github2jira",
+    "description": "Application to synchronize pull requests to Jira by listening for Github pull request events.",
+    "license": "MIT",
     "require": {
         "silex/silex": "dev-master",
         "zendframework/zend-xmlrpc": "@stable",
@@ -19,5 +21,8 @@
             "type": "composer",
             "url": "https://packages.zendframework.com/"
         }
-    ]
+    ],
+    "archive": {
+        "exclude": ["!vendor", ".git", "phake/docs/build"]
+    }
 }

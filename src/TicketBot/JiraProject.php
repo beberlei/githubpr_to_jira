@@ -47,7 +47,7 @@ ISSUETEXT;
 
     public function createNotifyComment(JiraIssue $issue, $sentToMaster = true)
     {
-        $link = $this->uri . "/browse/" . $issue->id;
+        $link = $this->uri . "/browse/" . $issue->key;
 
         if ( ! $sentToMaster) {
             return <<<TEXT

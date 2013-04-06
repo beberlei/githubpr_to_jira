@@ -43,6 +43,16 @@ class PullRequestEvent
         return $this->event['action'] === "opened";
     }
 
+    public function isClosed()
+    {
+        return $this->event['action'] === "closed";
+    }
+
+    public function isReopend()
+    {
+        return $this->event['action'] == "reopened";
+    }
+
     public function issueUrl()
     {
         return $this->event['pull_request']['html_url'];
