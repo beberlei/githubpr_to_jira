@@ -26,7 +26,7 @@ $app->post('/synchronizer/accept', function(Application $app, Request $request) 
     }
 
     $client = new Client();
-    $client->authenticate($request->server->get('GITHUB_OAUTH_TOKEN'));
+    $client->authenticate($request->server->get('GITHUB_OAUTH_TOKEN'), null, Client::AUTH_HTTP_TOKEN);
 
     $github = new Github($client);
     $synchronizer = new Synchronizer(Jira::create($project), $github);
