@@ -26,6 +26,7 @@ $app->post('/synchronizer/accept', function(Application $app, Request $request) 
     }
 
     $client = new Client();
+    $client->setHeaders(array('User-Agent' => 'beberlei'));
     $client->authenticate($request->server->get('GITHUB_OAUTH_TOKEN'), null, Client::AUTH_HTTP_TOKEN);
 
     $github = new Github($client);
