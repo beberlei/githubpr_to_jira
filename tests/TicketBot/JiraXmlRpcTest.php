@@ -2,7 +2,9 @@
 
 namespace TicketBot;
 
-class JiraTest extends \PHPUnit_Framework_TestCase
+use TicketBot\Jira\JiraXmlRpc;
+
+class JiraXmlRpcTest extends \PHPUnit_Framework_TestCase
 {
     private $client;
     private $token;
@@ -12,7 +14,7 @@ class JiraTest extends \PHPUnit_Framework_TestCase
     {
         $this->client = \Phake::mock('Zend\XmlRpc\Client');
         $this->token = new \stdClass;
-        $this->jira = new Jira($this->client, $this->token);
+        $this->jira = new JiraXmlRpc($this->client, $this->token);
     }
 
     public function testSearch()

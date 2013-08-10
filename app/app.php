@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 use TicketBot\Synchronizer;
 use TicketBot\Loader;
-use TicketBot\Jira;
+use TicketBot\Jira\JiraXmlRpc;
 use TicketBot\Github;
 use TicketBot\PullRequestEvent;
 
@@ -30,7 +30,7 @@ $app->post('/synchronizer/accept', function(Application $app, Request $request) 
     $client->authenticate($request->server->get('GITHUB_OAUTH_TOKEN'), null, Client::AUTH_HTTP_TOKEN);
 
     $github = new Github($client);
-    $synchronizer = new Synchronizer(Jira::create($project), $github);
+    $synchronizer = new Synchronizer(JiraXmlRpc::create($project), $github);
 
     $synchronizer->accept($event, $project);
 

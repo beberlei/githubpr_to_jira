@@ -64,6 +64,7 @@ TEXT
                     'ref' => 'master',
                     'repo' => array('name' => 'foo', 'owner' => array('login' => 'bar')),
                 ),
+                'merged' => true,
             )
         ));
 
