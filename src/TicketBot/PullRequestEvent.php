@@ -94,7 +94,7 @@ class PullRequestEvent
 
     public function searchTerms(JiraProject $project)
     {
-        $issueSearchTerms = array($this->issueUrl(), $this->issuePrefix());
+        $issueSearchTerms = array($this->issueUrl());
 
         if (preg_match_all('((' . preg_quote($project->shortname) . '\-[0-9]+))', $this->title() . " " . $this->body(), $matches)) {
             $issueSearchTerms = array_merge($issueSearchTerms, array_values(array_unique($matches[1])));

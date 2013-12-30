@@ -68,7 +68,7 @@ class JiraXmlRpc implements Jira
         $this->client->call("jira1.updateIssue", array(
             $this->token,
             $issue->key,
-            array("resolution" => array('id' => 1), "status" => array('id' => 5))
+            array("resolution" => array(1), "status" => array(5))
         ));
     }
 
@@ -77,7 +77,7 @@ class JiraXmlRpc implements Jira
         $this->client->call("jira1.updateIssue", array(
             $this->token,
             $issue->key,
-            array("resolution" => array('id' => 6), "status" => array('id' => 5))
+            array("resolution" => array(6), "status" => array(5))
         ));
     }
 }
