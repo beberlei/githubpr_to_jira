@@ -50,8 +50,8 @@ class PullRequestEventTest extends \PHPUnit_Framework_TestCase
             'pull_request' => array(
                 'html_url' => 'https://github.com/doctrine/doctrine2/pulls/127',
                 'user' => array('login' => 'beberlei'),
-                'title' => 'DDC-1234',
-                'body' => 'DDC-4567',
+                'title' => '[DDC-1234] Doing foo with pride',
+                'body' => 'Hello, talking about DDC-4567.',
             )
         ));
 
@@ -62,7 +62,6 @@ class PullRequestEventTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array(
             'https://github.com/doctrine/doctrine2/pulls/127',
-            '[GH-127]',
             'DDC-1234',
             'DDC-4567',
         ), $terms);
