@@ -24,6 +24,17 @@ Message:
 
 ISSUETEXT;
 
+    public function __construct(array $data = array())
+    {
+        foreach ($data as $k => $v) {
+            if ( ! property_exists($this, $k)) {
+                throw new \RuntimeException(sprintf("There is no property called '%s' on class '%s'.", $k, get_class($this)));
+            }
+
+            $this->$k = $v;
+        }
+    }
+
     public function createTicket(PullRequestEvent $pullRequestEvent)
     {
         $title = sprintf('%s %s', $pullRequestEvent->issuePrefix(), $pullRequestEvent->title());

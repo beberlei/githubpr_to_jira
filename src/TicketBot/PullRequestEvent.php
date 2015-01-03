@@ -65,6 +65,10 @@ class PullRequestEvent
 
     public function action()
     {
+        if ($this->isClosed() && $this->isMerged()) {
+            return 'merged';
+        }
+
         return $this->event['action'];
     }
 

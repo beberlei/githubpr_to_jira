@@ -1,7 +1,8 @@
 {
-    "uri": "",
-    "username": "",
-    "password": "",
+    "uri": "jira-root-endpoint",
+    "username": "xmlrpc-username",
+    "password": "xmlrpc-password",
     "ticketType": 4,
     "shortname": "DDC"
+    "assignUsername": "jira-user"
 }

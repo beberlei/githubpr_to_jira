@@ -34,4 +34,9 @@ class JiraIssue
         }
         return $issue;
     }
+
+    public function belongsTo(PullRequestEvent $event)
+    {
+        return strpos($this->summary, $event->issuePrefix()) === 0;
+    }
 }

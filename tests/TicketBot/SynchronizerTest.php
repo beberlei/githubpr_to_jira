@@ -32,9 +32,28 @@ TEXT
         );
     }
 
-    public function testUpdatedPullRequest()
+    public function testMergedPullRequest()
     {
         $event = $this->createPullRequestEvent('closed');
+
+        $jira = \Phake::mock('TicketBot\Jira');
+        $github = \Phake::mock('TicketBot\Github');
+
+        $project = new JiraProject();
+
+        \Phake::when($jira)->search(\Phake::anyParameters())->thenReturn(array(
+            $issue = JiraIssue::createFromArray(array("key" => "DDC-1234"))
+        ));
+
+        $synchronizer = new Synchronizer($jira, $github);
+        $synchronizer->accept($event, $project);
+
+        \Phake::verify($jira)->addComment($issue, "A related Github Pull-Request [GH-127] was merged:\nhttps://github.com/doctrine/doctrine2/pulls/127");
+    }
+
+    public function testClosedPullRequest()
+    {
+        $event = $this->createPullRequestEvent('closed', false);
 
         $jira = \Phake::mock('TicketBot\Jira');
         $github = \Phake::mock('TicketBot\Github');
@@ -51,7 +70,7 @@ TEXT
         \Phake::verify($jira)->addComment($issue, "A related Github Pull-Request [GH-127] was closed:\nhttps://github.com/doctrine/doctrine2/pulls/127");
     }
 
-    private function createPullRequestEvent($action)
+    private function createPullRequestEvent($action, $merged = true)
     {
         $event = new PullRequestEvent(array(
             'action' => $action,
@@ -64,7 +83,7 @@ TEXT
                     'ref' => 'master',
                     'repo' => array('name' => 'foo', 'owner' => array('login' => 'bar')),
                 ),
-                'merged' => true,
+                'merged' => $merged,
             )
         ));
 

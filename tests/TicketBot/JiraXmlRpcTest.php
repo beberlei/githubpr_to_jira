@@ -19,14 +19,15 @@ class JiraXmlRpcTest extends \PHPUnit_Framework_TestCase
 
     public function testSearch()
     {
+        $project = new JiraProject(array('shortname' => 'DDC'));
         \Phake::when($this->client)
-            ->call("jira1.getIssuesFromTextSearch", array($this->token, '"foo"'))
+            ->call("jira1.getIssuesFromTextSearchWithProject", array($this->token, array('DDC'), '"foo"', 10))
             ->thenReturn(array());
         \Phake::when($this->client)
-            ->call("jira1.getIssuesFromTextSearch", array($this->token, '"bar"'))
+            ->call("jira1.getIssuesFromTextSearchWithProject", array($this->token, array('DDC'), '"bar"', 10))
             ->thenReturn(array());
 
-        $issues = $this->jira->search(array("foo", "bar"));
+        $issues = $this->jira->search($project, array("foo", "bar"));
 
         $this->assertInternalType('array', $issues);
     }
@@ -63,6 +64,26 @@ class JiraXmlRpcTest extends \PHPUnit_Framework_TestCase
 
         \Phake::verify($this->client)
             ->call('jira1.addComment', array($this->token, 'DDC', 'some comment'));
+    }
+
+    public function testSearchIntegration()
+    {
+        if (!isset($_SERVER['JIRA_USERNAME']) || !isset($_SERVER['JIRA_URI']) || !isset($_SERVER['JIRA_PASSWORD'])) {
+            $this->markTestSkipped("Run test with JIRA_URI=http JIRA_USERNAME=foo JIRA_PASSWORD=bar to test integration for search.");
+        }
+
+        $project = new JiraProject(array(
+            'shortname' => 'DDC',
+            'uri' => $_SERVER['JIRA_URI'],
+            'username' => $_SERVER['JIRA_USERNAME'],
+            'password' => $_SERVER['JIRA_PASSWORD'],
+        ));
+        $jira = JiraXmlRpc::create($project);
+
+        $issues = $jira->search($project, array('Embedded'));
+
+        $this->assertTrue(count($issues) > 0);
+        $this->assertContainsOnly('TicketBot\JiraIssue', $issues);
     }
 }
 

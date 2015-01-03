@@ -28,12 +28,15 @@ class JiraXmlRpc implements Jira
         $this->token = $token;
     }
 
-    public function search(array $terms)
+    public function search(JiraProject $project, array $terms)
     {
         $issues = array();
 
         foreach ($terms as $term) {
-            $data = $this->client->call("jira1.getIssuesFromTextSearch", array($this->token, '"' . $term . '"'));
+            $data = $this->client->call(
+                "jira1.getIssuesFromTextSearchWithProject",
+                array($this->token, array($project->shortname), '"' . $term . '"', 10)
+            );
 
             foreach ($data as $row) {
                 $issue = JiraIssue::createFromArray($row);

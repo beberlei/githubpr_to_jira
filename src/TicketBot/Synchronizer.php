@@ -37,21 +37,40 @@ class Synchronizer
             return true;
         }
 
-        $issues = $this->jira->search($pullRequestEvent->searchTerms($project));
+        $issues = $this->jira->search(
+            $project,
+            $pullRequestEvent->searchTerms($project)
+        );
+
+        if (count($issues) === 0 && $pullRequestEvent->isOpened()) {
+            $newIssue = $project->createTicket($pullRequestEvent);
+            $jiraIssue = $this->jira->createIssue($project, $newIssue);
+
+            $this->github->addComment(
+                $pullRequestEvent->owner(),
+                $pullRequestEvent->repository(),
+                $pullRequestEvent->getId(),
+                $project->createNotifyComment($jiraIssue, $pullRequestEvent->isSendToMaster())
+            );
+
+            return true;
+        }
 
         foreach ($issues as $issue) {
             $this->jira->addComment($issue, $project->createComment($pullRequestEvent));
 
-            if ($pullRequestEvent->isClosed() && $pullRequestEvent->isMerged()) {
-                $this->jira->resolveIssue($issue);
-            }
+            if ($issue->belongsTo($pullRequestEvent)) {
+                if ($pullRequestEvent->isClosed() && $pullRequestEvent->isMerged()) {
+                    $this->jira->resolveIssue($issue);
+                }
 
-            if ($pullRequestEvent->isClosed() && ! $pullRequestEvent->isMerged()) {
-                $this->jira->markIssueInvalid($issue);
-            }
+                if ($pullRequestEvent->isClosed() && ! $pullRequestEvent->isMerged()) {
+                    $this->jira->markIssueInvalid($issue);
+                }
 
-            if ($pullRequestEvent->isReopened()) {
-                $this->jira->reopenIssue($issue);
+                if ($pullRequestEvent->isReopened()) {
+                    $this->jira->reopenIssue($issue);
+                }
             }
         }
 
