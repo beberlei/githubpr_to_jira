@@ -3,6 +3,6 @@
     "username": "xmlrpc-username",
     "password": "xmlrpc-password",
     "ticketType": 4,
-    "shortname": "DDC"
+    "shortname": "DDC",
     "assignUsername": "jira-user"
 }
