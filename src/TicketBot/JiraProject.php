@@ -64,7 +64,7 @@ ISSUETEXT;
             return <<<TEXT
 Hello,
 
-thank you for creating this pull request. However did not open it on the "master"
+thank you for creating this pull request. However you did not open it on the "master"
 branch. Our Git workflow requires all pull requests to go through "master" branch
 and the release masters then merge them back into stable branches, if they are
 bug fixes.
